@@ -1,0 +1,29 @@
+{
+    "name": "set/framework",
+    "description": "A simple framework to create RESTFul APIs which backend web-client resources",
+    "type": "library",
+    "require": {
+        "symfony/http-foundation": "6.2.x-dev",
+        "vlucas/phpdotenv": "5.4.x-dev"
+    },
+    "license": "MIT",
+    "autoload": {
+			"psr-4": {
+				"Set\\Framework\\": "src/",
+				"Database\\": "src/Database"
+			},
+			"classmap": [
+					"src/"
+			]
+    },
+    "authors": [
+        {
+            "name": "Samuel Espin Tolosa",
+            "email": "samuel.espintolosa@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    }
+}
