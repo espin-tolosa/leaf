@@ -25,5 +25,8 @@
     "minimum-stability": "dev",
     "require-dev": {
         "phpunit/phpunit": "^9"
-    }
+    },
+		"scripts": {
+			"serve": "symfony server:start --port=4321 --passthru=src/public/index.php"
+		}
 }

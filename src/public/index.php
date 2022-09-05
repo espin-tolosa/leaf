@@ -1,25 +1,41 @@
 <?php declare(strict_types=1);
 
+require_once realpath(__DIR__ . '/../../vendor/autoload.php');
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-require_once realpath("./vendor/autoload.php");
-
 $request = Request::createFromGlobals();
 
-$content = 'Hello ' . $request->query->get('name', 'World');
+$response = new Response();
 
-$content .= ' | ' . $request->headers->get('host');
-$content .= ' | ' . $request->headers->get('accept');
+$routemap = [
+	'/' => 'index',
+	'/spa' => 'spa',
+	'/api' => 'api',
+	'/notfound' => 'notfound',
+	'/backoffice' => 'backoffice',
+	'/authenticate' => 'authenticate'
+];
 
-$response = new Response(sprintf(htmlspecialchars($content, ENT_QUOTES, 'UTF-8')));
+function set_routemap_destination_folder(string $file) {
+	return realpath(__DIR__ . '/../pages/' . $file . '.php');
+}
+
+$path = $request->getPathInfo();
+
+if(isset($routemap[$path]))
+{
+	$page = $routemap[$path];
+	extract($request->query->all());
+	require set_routemap_destination_folder($page) ;
+	$response->setStatusCode(200);
+}
+else
+{
+	$page = $routemap['/notfound'];
+	require set_routemap_destination_folder($page) ;
+	$response->setStatusCode(404);
+}
 
 $response->send();
-
-
-
-
-echo "<br> REMOTE:";
-echo $_SERVER['REMOTE_ADDR'];
-echo "<br> FORWARDED:";
-echo $_SERVER['HTTP_X_FORWARDED_FOR'];
