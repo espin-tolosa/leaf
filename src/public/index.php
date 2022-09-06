@@ -4,38 +4,48 @@ require_once realpath(__DIR__ . '/../../vendor/autoload.php');
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing;
 
+
+/**
+ * Create Routes
+ */
+
+require_once realpath(__DIR__ . '/../app/routes/routemap.php');
+
+/**
+ * Read Request
+ */
+ 
 $request = Request::createFromGlobals();
+$context = new Routing\RequestContext();
+$context->fromRequest($request);
+$matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 
-$response = new Response();
+/**
+ * Match Request to send a proper Response
+ */
 
-$routemap = [
-	'/' => 'index',
-	'/spa' => 'spa',
-	'/api' => 'api',
-	'/notfound' => 'notfound',
-	'/backoffice' => 'backoffice',
-	'/authenticate' => 'authenticate'
-];
 
-function set_routemap_destination_folder(string $file) {
-	return realpath(__DIR__ . '/../pages/' . $file . '.php');
-}
-
-$path = $request->getPathInfo();
-
-if(isset($routemap[$path]))
-{
-	$page = $routemap[$path];
-	extract($request->query->all());
-	require set_routemap_destination_folder($page) ;
+try {
+	extract($matcher->match($request->getPathInfo()), EXTR_SKIP);	
+	ob_start();
+	$response = new Response();
+	include build_resource_path($_route) ;
+	$response->setContent(ob_get_clean());
 	$response->setStatusCode(200);
 }
-else
-{
-	$page = $routemap['/notfound'];
-	require set_routemap_destination_folder($page) ;
+
+catch (Routing\Exception\ResourceNotFoundException $exception) {
+	ob_start();
+	$response = new Response();
+	require build_resource_path('notfound') ;
+	$response->setContent(ob_get_clean());
 	$response->setStatusCode(404);
+}
+
+catch (Exception $exception) {
+	$response = new Response('An error occurred', 500);	
 }
 
 $response->send();
