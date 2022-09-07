@@ -14,7 +14,7 @@ $routes = new RouteCollection();
  * Index Controller
  */
 
-$routes->add('user-panel', new RoutingRoute('/user/{name}', [
+$routes->add('user_panel', new RoutingRoute('/user/{name}', [
 	'name' => 'invited',
 
 	'__controller' => function ($request) {
