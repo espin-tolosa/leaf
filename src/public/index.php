@@ -8,10 +8,11 @@ use Symfony\Component\Routing;
 
 
 /**
- * Create Routes
+ * Import Routes
  */
 
-require_once realpath(__DIR__ . '/../app/routes/routemap.php');
+require_once realpath(__DIR__ . '/../app/routes/web.php');
+require_once realpath(__DIR__ . '/../app/routes/resources.php');
 
 /**
  * Read Request
@@ -25,19 +26,6 @@ $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 /**
  * Template rendering
  */
-
- /**
-	* Try
-  */
-
-	function render_template(Request $request)
-	{	
-		global $response; //!This anoying line is needed to allow the included file have access to the response which is declared in the global scope
-		extract($request->attributes->all(), EXTR_SKIP);	
-		ob_start();
-		include build_resource_path($_route) ;
-	}
-
 	
 try {
 	$response = new Response();
