@@ -9,8 +9,18 @@ class Response {
 
 	public static function sendView(Request $request, int $status) {
 		$response = new HttpFoundationResponse();
-		call_user_func($request->attributes->get('__controller'), $request);
-		$response->setContent(ob_get_clean());
+		call_user_func($request->attributes->get('_controller'), $request);
+		$content= ob_get_clean();
+		$response->setContent($content);
+
+		switch ($content) {
+			case 'Not found':
+				$status = 404;
+				break;
+			case 'Unauthorized':
+				$status = 401;
+				break;
+		}
 		$response->setStatusCode($status);
 
 		return $response;

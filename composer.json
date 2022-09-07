@@ -5,7 +5,8 @@
     "require": {
         "symfony/http-foundation": "6.2.x-dev",
         "vlucas/phpdotenv": "5.4.x-dev",
-        "symfony/routing": "6.2.x-dev"
+        "symfony/routing": "6.2.x-dev",
+        "symfony/http-kernel": "6.2.x-dev"
     },
     "license": "MIT",
     "autoload": {
