@@ -33,12 +33,12 @@ try {
 
 catch (Routing\Exception\ResourceNotFoundException $exception) {
 	$request->attributes->add($matcher->match('/not-found'));
-	$response = HttpResponse::sendView($request, 404);
+	$response = HttpResponse::sendNotFound($request);
 }
 
 catch (Exception $exception) {
 	$request->attributes->add($matcher->match('/server-error'));
-	$response = HttpResponse::sendView($request, 500);
+	$response = HttpResponse::sendServerError($request);
 }
 
 $response->send();

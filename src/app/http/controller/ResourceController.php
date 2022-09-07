@@ -17,6 +17,7 @@ class ResourceController {
 		
 		if($token == null || $token != "irebljpnnpiv0ceaoa62psa01c") {
 			echo 'Unauthorized';
+			$request->attributes->add(['status' => 401]);
 			return;
 		}
 		
@@ -45,8 +46,8 @@ class ResourceController {
 				break;
 			
 			default:
-				header('Content-Type: text/html');
 				echo 'Not found';
+				$request->attributes->add(['status' => 404]);
 				break;
 		}	
 

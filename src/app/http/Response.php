@@ -8,21 +8,28 @@ use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 class Response {
 
 	public static function sendView(Request $request, int $status) {
-		$response = new HttpFoundationResponse();
 		call_user_func($request->attributes->get('_controller'), $request);
-		$content= ob_get_clean();
+		$status = $request->attributes->has('status') ? $request->attributes->get('status') : $status;
+		return Response::createResponse(ob_get_clean(), $status);
+	}
+
+	public static function sendNotFound(Request $request) {
+		call_user_func($request->attributes->get('_controller'), $request);
+		return Response::createResponse(ob_get_clean(), 404);
+
+	}
+	
+	public static function sendServerError(Request $request) {
+		call_user_func($request->attributes->get('_controller'), $request);
+		return Response::createResponse(ob_get_clean(), 500);
+
+	}
+
+	private static function createResponse($content, $status) {
+		$response = new HttpFoundationResponse();
 		$response->setContent($content);
-
-		switch ($content) {
-			case 'Not found':
-				$status = 404;
-				break;
-			case 'Unauthorized':
-				$status = 401;
-				break;
-		}
 		$response->setStatusCode($status);
-
 		return $response;
+
 	}
 }

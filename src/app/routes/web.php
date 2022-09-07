@@ -123,8 +123,8 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 				break;
 			
 			default:
-				header('Content-Type: text/html');
 				echo 'Not found';
+				$request->attributes->add(['status' => 404]);
 				break;
 		}	
 
