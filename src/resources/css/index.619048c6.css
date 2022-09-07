@@ -1,5 +1,5 @@
 html {background: gray}
 
-.error-message {
-	background: red;
+.failed-resource {
+	color: darkred;
 }

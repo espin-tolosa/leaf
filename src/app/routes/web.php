@@ -14,16 +14,14 @@ $routes = new RouteCollection();
  * Index Controller
  */
 
-$routes->add('index', new RoutingRoute('/index/{name}', [
-	'name' => 'World',
+$routes->add('user-panel', new RoutingRoute('/user/{name}', [
+	'name' => 'invited',
 	'__controller' => function ($request) {
-		$name = $request->attributes->get('number');
+		$name = $request->attributes->get('name');
 		$template = new Template($request);
-		$template->render(['name' => $name]);
 		$template->render(['name' => $name]);
 	}
 ]));
-
 
 /**
  * SPA Controller
@@ -40,7 +38,8 @@ $routes->add('spa', new RoutingRoute('/spa', [
 /**
  * Routes for Page Resources
  */
-$routes->add('is_even', new RoutingRoute('is_even/{number}', [
+
+$routes->add('is-even', new RoutingRoute('is_even/{number}', [
 	'number' => null,
 	'__controller' => function($request) {
 		$number = $request->attributes->get('number');
@@ -52,3 +51,15 @@ $routes->add('is_even', new RoutingRoute('is_even/{number}', [
 		$template->render(['number' => $number, 'isEven' => $isEven ]);
 	}
 ]) );
+
+/**
+ * NOT FOUND
+ */
+
+ $routes->add('not-found', new RoutingRoute('/notfound', [
+	'file' => '',
+	'__controller' => function ($request) {
+		$template = new Template($request);
+		$template->render(['failedRoute' => $request->getPathInfo()]);
+	}
+]));

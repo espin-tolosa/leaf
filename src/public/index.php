@@ -36,7 +36,10 @@ try {
 }
 
 catch (Routing\Exception\ResourceNotFoundException $exception) {
-	$response = new Response('Not Found', 404);
+	$request->attributes->add($matcher->match('/notfound'));
+	call_user_func($request->attributes->get('__controller'), $request);
+	$response->setContent(ob_get_clean());
+	$response->setStatusCode(404);
 }
 
 catch (Exception $exception) {
