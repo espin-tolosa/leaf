@@ -16,6 +16,7 @@ $routes = new RouteCollection();
 
 $routes->add('user-panel', new RoutingRoute('/user/{name}', [
 	'name' => 'invited',
+
 	'__controller' => function ($request) {
 		$name = $request->attributes->get('name');
 		$template = new Template($request);
@@ -28,7 +29,6 @@ $routes->add('user-panel', new RoutingRoute('/user/{name}', [
  */
 
 $routes->add('spa', new RoutingRoute('/spa', [
-	'file' => '',
 	'__controller' => function ($request) {
 		$template = new Template($request);
 		$template->render();
@@ -39,15 +39,14 @@ $routes->add('spa', new RoutingRoute('/spa', [
  * Routes for Page Resources
  */
 
-$routes->add('is-even', new RoutingRoute('is_even/{number}', [
+$routes->add('is_even', new RoutingRoute('is-even/{number}', [
 	'number' => null,
+
 	'__controller' => function($request) {
 		$number = $request->attributes->get('number');
 		$isEven = $number % 2 == 0 ? "YES" : "NO";
 		
 		$template = new Template($request);
-		$template->render(['number' => $number, 'isEven' => $isEven ]);
-		$template->render(['number' => $number, 'isEven' => $isEven ]);
 		$template->render(['number' => $number, 'isEven' => $isEven ]);
 	}
 ]) );
@@ -56,8 +55,18 @@ $routes->add('is-even', new RoutingRoute('is_even/{number}', [
  * NOT FOUND
  */
 
- $routes->add('not-found', new RoutingRoute('/notfound', [
-	'file' => '',
+ $routes->add('not_found', new RoutingRoute('/not-found', [
+	'__controller' => function ($request) {
+		$template = new Template($request);
+		$template->render(['failedRoute' => $request->getPathInfo()]);
+	}
+]));
+
+/**
+ * SERVER ERROR
+ */
+
+ $routes->add('server_error', new RoutingRoute('/server-error', [
 	'__controller' => function ($request) {
 		$template = new Template($request);
 		$template->render(['failedRoute' => $request->getPathInfo()]);

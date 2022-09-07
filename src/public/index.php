@@ -2,6 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../vendor/autoload.php');
 
+use Set\Framework\App\Http\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing;
@@ -28,22 +29,24 @@ $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
  */
 	
 try {
-	$response = new Response();
 	$request->attributes->add($matcher->match($request->getPathInfo()));
+	$response = new Response();
 	call_user_func($request->attributes->get('__controller'), $request);
 	$response->setContent(ob_get_clean());
 	$response->setStatusCode(200);
 }
 
 catch (Routing\Exception\ResourceNotFoundException $exception) {
-	$request->attributes->add($matcher->match('/notfound'));
-	call_user_func($request->attributes->get('__controller'), $request);
-	$response->setContent(ob_get_clean());
-	$response->setStatusCode(404);
+	$request->attributes->add($matcher->match('/not-found'));
+	$response = HttpResponse::sendView($request, 404);
 }
 
 catch (Exception $exception) {
-	$response = new Response('Server Error', 500);
+	$request->attributes->add($matcher->match('/server-error'));
+	$response = new Response();
+	call_user_func($request->attributes->get('__controller'), $request);
+	$response->setContent(ob_get_clean());
+	$response->setStatusCode(500);
 }
 
 $response->send();
