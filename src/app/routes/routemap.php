@@ -16,11 +16,36 @@ function build_resource_path(string $file) {
  */
 
 $routes = new RouteCollection();
-$routes->add('index', new RoutingRoute('/index/{name}', ['name' => 'World']));
-$routes->add('spa', new RoutingRoute('/spa'));
+
+/**
+ * Index Controller
+ */
+
+$routes->add('index', new RoutingRoute('/index/{name}', [
+	'name' => 'World',
+	'__controller' => function ($request) {
+			render_template($request);
+	}
+]));
+
+/**
+ * SPA Controller
+ */
+
+$routes->add('spa', new RoutingRoute('/spa', [
+	'file' => '',
+	'__controller' => function ($request) {
+			render_template($request);
+	}
+]));
 
 /**
  * Routes for Page Resources
  */
 
-$routes->add('public', new RoutingRoute('/public/{file}', ['file' => '']));
+$routes->add('public', new RoutingRoute('/public/{file}', [
+	'file' => '',
+	'__controller' => function ($request) {
+			render_template($request);
+	}
+]));

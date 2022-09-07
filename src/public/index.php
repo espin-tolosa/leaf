@@ -23,29 +23,36 @@ $context->fromRequest($request);
 $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 
 /**
- * Match Request to send a proper Response
+ * Template rendering
  */
 
+ /**
+	* Try
+  */
 
+	function render_template(Request $request)
+	{	
+		global $response; //!This anoying line is needed to allow the included file have access to the response which is declared in the global scope
+		extract($request->attributes->all(), EXTR_SKIP);	
+		ob_start();
+		include build_resource_path($_route) ;
+	}
+
+	
 try {
-	extract($matcher->match($request->getPathInfo()), EXTR_SKIP);	
-	ob_start();
 	$response = new Response();
-	include build_resource_path($_route) ;
+	$request->attributes->add($matcher->match($request->getPathInfo()));
+	call_user_func($request->attributes->get('__controller'), $request);
 	$response->setContent(ob_get_clean());
 	$response->setStatusCode(200);
 }
 
 catch (Routing\Exception\ResourceNotFoundException $exception) {
-	ob_start();
-	$response = new Response();
-	require build_resource_path('notfound') ;
-	$response->setContent(ob_get_clean());
-	$response->setStatusCode(404);
+	$response = new Response('Not Found', 404);
 }
 
 catch (Exception $exception) {
-	$response = new Response('An error occurred', 500);	
+	$response = new Response('Server Error', 500);
 }
 
 $response->send();
