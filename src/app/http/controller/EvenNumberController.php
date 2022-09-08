@@ -7,7 +7,7 @@ use Set\Framework\App\Routes\Template;
 class EvenNumberController {
 	public function isEven($request){
 		$number = $request->attributes->get('number');
-		$isEven = $number % 2 == 0 ? "YES" : "NO";
+		$isEven = $number % 2 === 0 ? "YES" : "NO";
 		
 		$template = new Template($request);
 		$template->render(['number' => $number, 'isEven' => $isEven ]);

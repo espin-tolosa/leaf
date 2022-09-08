@@ -20,7 +20,7 @@ class Template {
 	}
 
 	private function openBuffer() {
-		$ob_is_unset = ob_get_level() == 0;	
+		$ob_is_unset = ob_get_level() === 0;
 		if($ob_is_unset)
 		{
 			ob_start();

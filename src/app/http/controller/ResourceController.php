@@ -15,7 +15,7 @@ class ResourceController {
 		 * then I could use clause guards properly instead of need to nest the response
 		 */
 		
-		if($token == null || $token != "irebljpnnpiv0ceaoa62psa01c") {
+		if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01c") {
 			echo 'Unauthorized';
 			$request->attributes->add(['status' => 401]);
 			return;

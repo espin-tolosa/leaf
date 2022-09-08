@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-use Set\Framework\App\Http\Controller\EvenNumberController;
-use Set\Framework\App\Http\Controller\ResourceController;
 use Set\Framework\App\Routes\Template;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route as RoutingRoute;
@@ -46,7 +44,7 @@ $routes->add('is_even', new RoutingRoute('is-even/{number}', [
 
 	'_controller' => function($request) {
 		$number = $request->attributes->get('number');
-		$isEven = $number % 2 == 0 ? "YES" : "NO";
+		$isEven = $number % 2 === 0 ? "YES" : "NO";
 		
 		$template = new Template($request);
 		$template->render(['number' => $number, 'isEven' => $isEven ]);
@@ -93,7 +91,7 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 		 * then I could use clause guards properly instead of need to nest the response
 		 */
 		
-		if($token == null || $token != "irebljpnnpiv0ceaoa62psa01c") {
+		if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01c") {
 			echo 'Unauthorized';
 			return;
 		}
