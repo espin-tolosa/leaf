@@ -21,8 +21,8 @@ $routes->add('user_panel', new RoutingRoute('/user/{name}', [
 	'_controller' => function ($request) {
 		$name = $request->attributes->get('name');
 		$resource = new ResourceRenderer($request);
-		$resource->template(['name' => $name]);
-		return new Response(ob_get_clean(), 200);
+		$status = $resource->template(['name' => $name]);
+		return new Response(ob_get_clean(), $status ? $status : 200);
 	}
 ]));
 
@@ -33,8 +33,8 @@ $routes->add('user_panel', new RoutingRoute('/user/{name}', [
 $routes->add('spa', new RoutingRoute('/spa', [
 	'_controller' => function ($request) {
 		$resource = new ResourceRenderer($request);
-		$resource->template();
-		return new Response(ob_get_clean(), 200);
+		$status = $resource->template();
+		return new Response(ob_get_clean(), $status ? $status : 200);
 	}
 ]));
 
@@ -95,7 +95,7 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 		$properties = explode('.', $file);
 		$type = $properties[count($properties)-1];
 		$resource = new ResourceRenderer($request); //$resource->media() doesn't need the request infact
-		
+
 		$response = new Response();
 		switch ($type) {
 			case 'svg':
@@ -112,14 +112,14 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 			
 			default:
 				$response->headers->set('Content-Type', 'text/plain; charset=UTF-8');
-				$response = new Response('Resource ' . $file . ' of type ' . $type . ' is not valid', 400);
+				$response = new Response('Bad Request: resource <strong> ' . $file . '</strong> of type <strong>' .  $type . '</strong> is not valid', 400);
 				return $response;
 				break;
 		}
 
-		$resource->media($file);
+		$status = $resource->media($file);
 		$response->setContent(ob_get_clean());
-		$response->setStatusCode(200);
+		$response->setStatusCode($status ? $status : 200);
 		return $response;
 	}
 ]));

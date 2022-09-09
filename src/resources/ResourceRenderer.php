@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Render the template
  * 
- * create an object buffer and send all the html
+ * create an object buffer and send all the html: this is pure side effect class that writes in the php ob
+ * aditionally, render methods: template and media can fail if the object is not found, so they can return also a status code
+ * which can be used by controller in order to decide what status respond
  */
 
 class ResourceRenderer {
@@ -26,7 +28,12 @@ class ResourceRenderer {
 	public function template(?array $view = []) {	
 		extract($view, EXTR_SKIP);
 		$this->openBuffer(); //open Buffer
-		include $this->build_resource_path($this->route); //write resource to a Buffer
+		if(!$this->build_resource_path($this->route))
+		{
+			echo 'Server Error: Deleted Template Resource unexpectedly: ' . $this->route;
+			return 500;
+		}
+		include ($this->build_resource_path($this->route)); //write resource to a Buffer
 	}
 
 	public function text(string $content) {
@@ -36,11 +43,16 @@ class ResourceRenderer {
 	}
 
 	public function media(string $file) {
-		$properties = explode('.', $file);
-		$type = $properties[count($properties)-1];
+		
 		$this->openBuffer();
-		//ob_start();
-		readfile (realpath(__DIR__ . '/' . $type .'/' . $file));
+
+		if(!$this->build_media_path($file))
+		{
+			echo '/*Not found error in file: ' . $file .'*/';
+			return 404;
+		}
+
+		readfile ($this->build_media_path($file));	
 	}
 	
 	/**
@@ -49,6 +61,13 @@ class ResourceRenderer {
 	
 	private function build_resource_path(string $file) {
 		return realpath(__DIR__ . '/' .  'templates' . '/' . $file . '.php');
+	}
+
+	private function build_media_path(string $file) {
+		$properties = explode('.', $file);
+		$type = $properties[count($properties)-1];
+		return realpath(__DIR__ . '/' . $type .'/' . $file);
+
 	}
 }
 
