@@ -20,8 +20,9 @@ $routes->add('user_panel', new RoutingRoute('/user/{name}', [
 
 	'_controller' => function ($request) {
 		$name = $request->attributes->get('name');
-		$template = new ($request);
-		$template->render(['name' => $name]);
+		$resource = new ResourceRenderer($request);
+		$resource->template(['name' => $name]);
+		return new Response(ob_get_clean(), 200);
 	}
 ]));
 
@@ -95,31 +96,30 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 		$type = $properties[count($properties)-1];
 		$resource = new ResourceRenderer($request); //$resource->media() doesn't need the request infact
 		
+		$response = new Response();
 		switch ($type) {
 			case 'svg':
-				$response = new Response(ob_get_clean(), 200);
 				$response->headers->set('Content-Type', 'image/svg+xml');
-				$resource->media($file);
 				break;
 
 			case 'js':
-				$response = new Response(ob_get_clean(), 200);
-				$response->headers->set('Content-Type', 'application/javascript, max-age=604800, public');
-				$resource->media($file);
+				$response->headers->set('Content-Type', 'text/javascript, max-age=604800, public, UTF-8');
 				break;
 
 			case 'css':
-				$response = new Response(ob_get_clean(), 200);
 				$response->headers->set('Content-Type', 'text/css, max-age=604800, public');
-				$resource->media($file);
 				break;
 			
 			default:
-			$response = new Response('Not found', 404);
-			$response->headers->set('Content-Type', 'html/text');
+				$response->headers->set('Content-Type', 'text/plain; charset=UTF-8');
+				$response = new Response('Resource ' . $file . ' of type ' . $type . ' is not valid', 400);
+				return $response;
 				break;
 		}
 
+		$resource->media($file);
+		$response->setContent(ob_get_clean());
+		$response->setStatusCode(200);
 		return $response;
 	}
 ]));

@@ -20,11 +20,7 @@ class ResourceRenderer {
 	}
 
 	private function openBuffer() {
-		$ob_is_unset = ob_get_level() === 0;
-		if($ob_is_unset)
-		{
-			ob_start();
-		}
+		ob_start();
 	}
 	
 	public function template(?array $view = []) {	
@@ -43,6 +39,7 @@ class ResourceRenderer {
 		$properties = explode('.', $file);
 		$type = $properties[count($properties)-1];
 		$this->openBuffer();
+		//ob_start();
 		readfile (realpath(__DIR__ . '/' . $type .'/' . $file));
 	}
 	
