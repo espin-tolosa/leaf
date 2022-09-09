@@ -9,5 +9,8 @@
   </head>
   <body>
 		<h1 class="error-message">Sorry, we can't find this resource: <span class="failed-resource"> <?= $view['failedRoute'] ?> </span> in our service</h1>
+		<p>
+			<?php var_dump($exception); ?>
+		</p>
   </body>
 </html>

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Set\Framework\App\Routes;
+namespace Set\Framework\resources;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
  * create an object buffer and send all the html
  */
 
-class Template {
+class ResourceRenderer {
 
 	private string $route;
 
@@ -27,11 +27,23 @@ class Template {
 		}
 	}
 	
-	public function render(?array $view = [])
-	{	
+	public function template(?array $view = []) {	
 		extract($view, EXTR_SKIP);
+		$this->openBuffer(); //open Buffer
+		include $this->build_resource_path($this->route); //write resource to a Buffer
+	}
+
+	public function text(string $content) {
+		extract($view, EXTR_SKIP);
+		$this->openBuffer(); //open Buffer
+		echo $content;
+	}
+
+	public function media(string $file) {
+		$properties = explode('.', $file);
+		$type = $properties[count($properties)-1];
 		$this->openBuffer();
-		include $this->build_resource_path($this->route);
+		readfile (realpath(__DIR__ . '/' . $type .'/' . $file));
 	}
 	
 	/**
@@ -39,7 +51,7 @@ class Template {
 	 */
 	
 	private function build_resource_path(string $file) {
-		return realpath(__DIR__ . '/../../resources/templates/' . $file . '.php');
+		return realpath(__DIR__ . '/' .  'templates' . '/' . $file . '.php');
 	}
 }
 

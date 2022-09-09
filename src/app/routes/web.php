@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
-use Set\Framework\App\Routes\Template;
+use Set\Framework\resources\ResourceRenderer;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route as RoutingRoute;
 
@@ -19,7 +20,7 @@ $routes->add('user_panel', new RoutingRoute('/user/{name}', [
 
 	'_controller' => function ($request) {
 		$name = $request->attributes->get('name');
-		$template = new Template($request);
+		$template = new ($request);
 		$template->render(['name' => $name]);
 	}
 ]));
@@ -30,26 +31,11 @@ $routes->add('user_panel', new RoutingRoute('/user/{name}', [
 
 $routes->add('spa', new RoutingRoute('/spa', [
 	'_controller' => function ($request) {
-		$template = new Template($request);
-		$template->render();
+		$resource = new ResourceRenderer($request);
+		$resource->template();
+		return new Response(ob_get_clean(), 200);
 	}
 ]));
-
-/**
- * Routes for Page Resources
- */
-
-$routes->add('is_even', new RoutingRoute('is-even/{number}', [
-	'number' => null,
-
-	'_controller' => function($request) {
-		$number = $request->attributes->get('number');
-		$isEven = $number % 2 === 0 ? "YES" : "NO";
-		
-		$template = new Template($request);
-		$template->render(['number' => $number, 'isEven' => $isEven ]);
-	}
-]) );
 
 /**
  * NOT FOUND
@@ -57,8 +43,10 @@ $routes->add('is_even', new RoutingRoute('is-even/{number}', [
 
  $routes->add('not_found', new RoutingRoute('/not-found', [
 	'_controller' => function ($request) {
-		$template = new Template($request);
-		$template->render(['failedRoute' => $request->getPathInfo()]);
+		$resource = new ResourceRenderer($request);
+		$exception = $request->attributes->get('exception');
+		$resource->template(['failedRoute' => $request->getPathInfo(), 'exception' => $exception]);
+		return new Response(ob_get_clean(), 404);
 	}
 ]));
 
@@ -68,8 +56,10 @@ $routes->add('is_even', new RoutingRoute('is-even/{number}', [
 
  $routes->add('server_error', new RoutingRoute('/server-error', [
 	'_controller' => function ($request) {
-		$template = new Template($request);
-		$template->render(['failedRoute' => $request->getPathInfo()]);
+		$resource = new ResourceRenderer($request);
+		$exception = $request->attributes->get('exception');
+		$resource->template(['failedRoute' => $request->getPathInfo(), 'exception' => $exception]);
+		return new Response(ob_get_clean(), 500);
 	}
 ]));
 
@@ -91,9 +81,10 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 		 * then I could use clause guards properly instead of need to nest the response
 		 */
 		
-		if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01c") {
-			echo 'Unauthorized';
-			return;
+		if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01") {
+			$response = new Response('Unauthorized', 401);
+			$response->headers->set('Content-Type', 'text/plain');
+			return $response;
 		}
 		
 		/**
@@ -102,30 +93,33 @@ $routes->add('public', new RoutingRoute('/public/{file}', [
 
 		$properties = explode('.', $file);
 		$type = $properties[count($properties)-1];
-		ob_start();
+		$resource = new ResourceRenderer($request); //$resource->media() doesn't need the request infact
 		
 		switch ($type) {
 			case 'svg':
-				header('Content-Type: image/svg+xml');
-				readfile (realpath(__DIR__ . '/../../resources/'. $type .'/' . $file));
+				$response = new Response(ob_get_clean(), 200);
+				$response->headers->set('Content-Type', 'image/svg+xml');
+				$resource->media($file);
 				break;
 
 			case 'js':
-				header('Content-Type: application/javascript, max-age=604800, public');
-				readfile (realpath(__DIR__ . '/../../resources/'. $type .'/' . $file));
+				$response = new Response(ob_get_clean(), 200);
+				$response->headers->set('Content-Type', 'application/javascript, max-age=604800, public');
+				$resource->media($file);
 				break;
 
 			case 'css':
-				header('Content-Type: text/css, max-age=604800, public');
-				readfile (realpath(__DIR__ . '/../../resources/'. $type .'/' . $file));
+				$response = new Response(ob_get_clean(), 200);
+				$response->headers->set('Content-Type', 'text/css, max-age=604800, public');
+				$resource->media($file);
 				break;
 			
 			default:
-				echo 'Not found';
-				$request->attributes->add(['status' => 404]);
+			$response = new Response('Not found', 404);
+			$response->headers->set('Content-Type', 'html/text');
 				break;
-		}	
+		}
 
-
+		return $response;
 	}
 ]));

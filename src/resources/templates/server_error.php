@@ -9,5 +9,8 @@
   </head>
   <body>
 		<h1 class="error-message">Sorry, we have an internal error processing your request, if this happen again contact with support</h1>
+		<p>
+			<?php echo $exception; ?>
+		</p>
   </body>
 </html>
