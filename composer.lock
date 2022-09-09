@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8f4a5037267207fe47e628b330f60a3",
+    "content-hash": "c63e1929a0436bd9e412068404f7a64c",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -1876,12 +1876,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "f7cae484eea6097891dfc175db3398c7fd1f940d"
+                "reference": "d93eb07bc630ba445f01aac979eee98a92830d7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f7cae484eea6097891dfc175db3398c7fd1f940d",
-                "reference": "f7cae484eea6097891dfc175db3398c7fd1f940d",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d93eb07bc630ba445f01aac979eee98a92830d7e",
+                "reference": "d93eb07bc630ba445f01aac979eee98a92830d7e",
                 "shasum": ""
             },
             "require": {
@@ -1966,7 +1966,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-03T16:01:27+00:00"
+            "time": "2022-09-07T05:30:41+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -2989,7 +2989,8 @@
         "symfony/http-foundation": 20,
         "vlucas/phpdotenv": 20,
         "symfony/routing": 20,
-        "symfony/http-kernel": 20
+        "symfony/http-kernel": 20,
+        "symfony/event-dispatcher": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
