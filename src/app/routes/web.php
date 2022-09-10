@@ -70,21 +70,7 @@ class WebRoutes {
 
 		'_controller' => function ($request) {
 			$file = $request->attributes->get('file');
-			$token = $request->cookies->has('jwt') ? $request->cookies->get('jwt') : null;
-
-			/**
-			 * Middleware Authorization
-			 *
-			 * this has entity has to be created and layered before request match and the second check not being hard-coded
-			 * then I could use clause guards properly instead of need to nest the response
-			 */
-
-			if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01") {
-				$response = new Response('Unauthorized', 401);
-				$response->headers->set('Content-Type', 'text/plain');
-				return $response;
-			}
-
+			
 			/**
 			 * Resource request classification coupled to File Serving
 			 */
