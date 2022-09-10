@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 
-use App\Leaf\Framework;
-use Set\Framework\App\plugins\AuthorizationListener;
-use Set\Framework\App\plugins\ContentLengthListener;
-use Set\Framework\App\plugins\ContentTypeListener;
-use Set\Framework\App\plugins\GoogleListener;
-use Set\Framework\App\plugins\KernelListener;
+use Leaf\Http\Response\Kernel;
+use Set\Routes\WebRoutes;
+use Leaf\Plugins\AuthorizationListener;
+use Leaf\Plugins\ContentLengthListener;
+use Leaf\Plugins\ContentTypeListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 //use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
@@ -13,7 +12,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use WebRoutes;
 
 require_once realpath(__DIR__ . '/../../vendor/autoload.php');
 
@@ -43,6 +41,6 @@ $dispatcher->addSubscriber(new ContentLengthListener());
  * Call framework Request -> Response processor
  */
 
-$framework = new Framework($matcher, $controllerResolver /*, $argumentResolver*/, $dispatcher);
-$response = $framework->handle($request);
+$kernel = new Kernel($matcher, $controllerResolver /*, $argumentResolver*/, $dispatcher);
+$response = $kernel->handle($request);
 $response->send();

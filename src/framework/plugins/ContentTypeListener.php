@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Set\Framework\App\plugins;
+namespace Leaf\Plugins;
 
-use Set\Framework\App\Http\Events\ResponseEvent;
+use Leaf\Http\Events\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContentTypeListener implements EventSubscriberInterface {

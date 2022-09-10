@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
-use Set\Framework\resources\ResourceRenderer;
+namespace Set\Routes;
+
+use Set\Resources\ResourceRenderer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route as RoutingRoute;
 

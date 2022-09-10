@@ -12,8 +12,8 @@
     "license": "MIT",
     "autoload": {
 			"psr-4": {
-				"Set\\Framework\\": "src/",
-				"Database\\": "src/Database"
+				"Set\\": "src/",
+				"Leaf\\": "src/framework"
 			},
 			"classmap": [
 					"src/"

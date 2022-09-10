@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Set\Framework\resources;
+namespace Set\Resources;
 
 use Symfony\Component\HttpFoundation\Request;
 

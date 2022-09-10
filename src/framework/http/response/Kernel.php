@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Leaf;
+namespace Leaf\Http\Response;
 
 use Exception;
-use Set\Framework\App\Http\Events\ResponseEvent;
+use Leaf\Http\Events\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  * 3.			Send Response to the client
  */
 
-class Framework {
+class Kernel {
 	
 	private UrlMatcher $matcher;
 	private ControllerResolver $controllerResolver;
