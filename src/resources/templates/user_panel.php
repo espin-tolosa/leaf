@@ -8,6 +8,6 @@
 		<link rel="stylesheet" href="/public/index.619048c6.css">
   </head>
   <body>
-		Hello <?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>
+		Hello <?=htmlspecialchars($name, ENT_QUOTES, 'UTF-8')?>	
 	</body>
 </html>

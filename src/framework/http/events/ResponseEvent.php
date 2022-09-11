@@ -17,7 +17,7 @@ final class ResponseEvent extends Event {
 	private Response $response;
 	private Request $request;
 
-	public function __construct(Response $response, Request $request) {
+	public function __construct(Response $response, $request) {
 		$this->response = $response;
 		$this->request = $request;
 	}

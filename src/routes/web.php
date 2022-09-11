@@ -2,6 +2,7 @@
 
 namespace Set\Routes;
 
+use Leaf\Http\Events\ContentTypeEvent;
 use Set\Resources\ResourceRenderer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route as RoutingRoute;
@@ -72,33 +73,30 @@ class WebRoutes {
 
 		'_controller' => function ($request) {
 			$file = $request->attributes->get('file');
-			
+			$attributes = explode('.', $file);
+
 			/**
-			 * Resource request classification coupled to File Serving
+			 * Emmit Event which Type defined at run-time
 			 */
 
-			$properties = explode('.', $file);
-			$type = $properties[count($properties)-1];
-			$resource = new ResourceRenderer($request); //$resource->media() doesn't need the request infact
+			$type = ContentTypeEvent::PREFIX . $attributes[array_key_last($attributes)];
+			
+			/**
+			 * Generate the Response
+			 */
 
 			$response = new Response();
-			switch ($type) {
-				case 'svg':
-					$response->headers->set('Content-Type', 'image/svg+xml');
-					break;
+			$resource = new ResourceRenderer($request); //$resource->media() doesn't need the request infact
 
-				case 'js':
-					$response->headers->set('Content-Type', 'text/javascript, max-age=604800, public, UTF-8');
-					break;
+			/**
+			 * Call Dispatcher to set the content type of the file
+			 */
 
-				case 'css':
-					$response->headers->set('Content-Type', 'text/css, max-age=604800, public');
-					break;
+			$request->attributes->get('dispatcher')->dispatch(new ContentTypeEvent($response, $type), $type);
 
-				default:
-					$response->headers->set('Content-Type', 'text/plain; charset=UTF-8');
-					$response = new Response('Bad Request: resource <strong> ' . $file . '</strong> of type <strong>' .  $type . '</strong> is not valid', 400);
-					return $response;
+    	if(!$response->headers->has('Content-Type'))
+			{
+				return new Response('Bad Request: not valid type of resource <strong>' . $file . '</strong>', 400, ['Content-Type' => 'text/html']);
 			}
 
 			$status = $resource->media($file);

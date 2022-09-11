@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ContentLengthListener implements EventSubscriberInterface
 {
 	public static function getSubscribedEvents() {
-		return ['kernel.response' => 'onResponse'];		
+		return ['kernel.response.content-length' => 'onResponse'];		
 	}
 
   public function onResponse(ResponseEvent $event) {

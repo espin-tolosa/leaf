@@ -24,12 +24,12 @@ class AuthorizationListener implements EventSubscriberInterface {
 			 * then I could use clause guards properly instead of need to nest the response
 			 */
 
-			//if($token === null || $token !== "irebljpnnpiv0ceaoa62psa01") {
-			if(false) {
+			if($token === null || $token !== "sam") {
 				$response->setContent('Unauthorized');
 				$response->setStatusCode(401);
 				$response->headers->set('Content-Type', 'text/plain');
-				return $response;
+				$request->attributes->set('response', $response);
+				//TODO: Add Custom Error Handling using HtppKernel Class
 			}
 		}
 }

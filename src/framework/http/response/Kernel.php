@@ -3,12 +3,14 @@
 namespace Leaf\Http\Response;
 
 use Exception;
+use Leaf\Http\Events\AuthorizationEvent;
 use Leaf\Http\Events\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 //use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
@@ -24,7 +26,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  * 3.			Send Response to the client
  */
 
-class Kernel {
+class Kernel implements HttpKernelInterface {
 	
 	private UrlMatcher $matcher;
 	private ControllerResolver $controllerResolver;
@@ -43,31 +45,32 @@ class Kernel {
 		$this->dispatcher = $dispatcher;
 	}
 	
-	public function handle(Request $request) {
+	public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST,	bool $catch = false): Response	 {
 		
 		/**
-		 * Dispatch an Event before pass the request to the framework to check authorization
+		 * Check Authorization
 		 */
+
 		$response = new Response();
 		$this->dispatcher->dispatch(new ResponseEvent($response, $request), 'kernel.authorization');
-		$this->matcher->getContext()->fromRequest($request);
-
-		$response->getStatusCode();
-
-		if($response->getStatusCode() === 401)
+		if($request->attributes->has('response') && $request->attributes->get('response')->getStatusCode() === 401)
 		{
-			return $response;
+			return $request->attributes->get('response');
 		}
 
 		/**
-		 * Request is Authorized
+		 * Process Request
 		 */
-	
+
+		$this->matcher->getContext()->fromRequest($request);
+
 		try {
 			$request->attributes->add($this->matcher->match($request->getPathInfo()));
 			
 			$controller = $this->controllerResolver->getController($request);
 			//$arguments = $this->argumentResolver->getArguments($request, $controller);
+
+			$request->attributes->add(['dispatcher' => $this->dispatcher]);
 
 			$response = call_user_func($controller, $request);
 		}
@@ -89,9 +92,10 @@ class Kernel {
 		}
 
 		/**
-		 * Dispatch an Event before send the response
+		 * Post process response
 		 */
-		$this->dispatcher->dispatch(new ResponseEvent($response, $request), 'kernel.response');
+
+		$this->dispatcher->dispatch(new ResponseEvent($response, $request), 'kernel.response.content-length');
 
 		return $response;
 	}

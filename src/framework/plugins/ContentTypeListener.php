@@ -2,24 +2,30 @@
 
 namespace Leaf\Plugins;
 
-use Leaf\Http\Events\ResponseEvent;
+use Leaf\Http\Events\ContentTypeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContentTypeListener implements EventSubscriberInterface {
     public static function getSubscribedEvents() {
-      return ['kernel.response' => 'onResponse'];
+      return [
+				ContentTypeEvent::PREFIX .'js' => 'onJS',
+				ContentTypeEvent::PREFIX .'css' => 'onCSS',
+				ContentTypeEvent::PREFIX .'svg' => 'onSVG',
+			];
     }
 
-    public function onResponse(ResponseEvent $event) {
+    public function onJS(ContentTypeEvent $event) {
       $response = $event->getResponse();
-
-      if ($response->isRedirection()
-          || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
-          || 'html' !== $event->getRequest()->getRequestFormat()
-      ) {
-          return;
-      }
-
-      $response->setContent($response->getContent().'GA CODE');
+			$response->headers->set('Content-Type', 'application/javascript');
+    }
+    
+		public function onSVG(ContentTypeEvent $event) {
+      $response = $event->getResponse();
+			$response->headers->set('Content-Type', 'image/svg+xml');
+    }
+    
+		public function onCSS(ContentTypeEvent $event) {
+      $response = $event->getResponse();
+			$response->headers->set('Content-Type', 'text/css, max-age=604800, public');
     }
 }

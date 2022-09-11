@@ -2,7 +2,6 @@
 
 namespace Leaf\Http\Events;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -10,24 +9,19 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Simple Demo Class of Event of some type of object
  */
 
-final class AuthorizationEvent extends Event {
+final class ContentTypeEvent extends Event {
 
-	public const NAME = 'kernel.authorization';
+	public const PREFIX = 'routes.response.content-type.';
+	public string $NAME;
 
 	private Response $response;
-	private Request $request;
 
-	public function __construct(Response $response, Request $request) {
+	public function __construct(Response $response, $type) {
 		$this->response = $response;
-		$this->request = $request;
+		$this->NAME = self::PREFIX . $type;
 	}
 
 	public function getResponse() {
 		return $this->response;
 	}
-
-	public function getRequest() {
-		return $this->request;
-	}
-
 }

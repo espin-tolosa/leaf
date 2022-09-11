@@ -1,0 +1,10 @@
+parameters:
+mailer_provider.name: developmentEnv
+
+services:
+  mailer:
+    class: Mailer
+    arguments: [MailerProvider]
+  mailer_provider:
+    class: MailerProvider
+    arguments: ['%mailer_provider.name%']
