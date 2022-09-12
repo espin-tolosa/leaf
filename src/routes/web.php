@@ -6,16 +6,17 @@ use Leaf\Http\Events\ContentTypeEvent;
 use Set\Resources\ResourceRenderer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route as RoutingRoute;
+use Symfony\Component\Routing\RouteCollection;
 
-class WebRoutes {
+class WebRoutes extends RouteCollection {
 
-	public static function add($routes) {
+	public function __construct() {
 
 	/**
 	 * Index Controller
 	 */
 
-	$routes->add('user_panel', new RoutingRoute('/user/{name}', [
+	$this->add('user_panel', new RoutingRoute('/user/{name}', [
 		'name' => 'invited',
 
 		'_controller' => function ($request) {
@@ -30,7 +31,7 @@ class WebRoutes {
 	 * SPA Controller
 	 */
 
-	$routes->add('spa', new RoutingRoute('/spa', [
+	$this->add('spa', new RoutingRoute('/spa', [
 		'_controller' => function ($request) {
 			$resource = new ResourceRenderer($request);
 			$status = $resource->template();
@@ -42,7 +43,7 @@ class WebRoutes {
 	 * NOT FOUND
 	 */
 
-	 $routes->add('not_found', new RoutingRoute('/not-found', [
+	 $this->add('not_found', new RoutingRoute('/not-found', [
 		'_controller' => function ($request) {
 			$resource = new ResourceRenderer($request);
 			$exception = $request->attributes->get('exception');
@@ -55,7 +56,7 @@ class WebRoutes {
 	 * SERVER ERROR
 	 */
 
-	 $routes->add('server_error', new RoutingRoute('/server-error', [
+	 $this->add('server_error', new RoutingRoute('/server-error', [
 		'_controller' => function ($request) {
 			$resource = new ResourceRenderer($request);
 			$exception = $request->attributes->get('exception');
@@ -68,7 +69,7 @@ class WebRoutes {
 	 * Resources of the web: svg, css, js
 	 */
 
-	$routes->add('public', new RoutingRoute('/public/{file}', [
+	$this->add('public', new RoutingRoute('/public/{file}', [
 		'file' => '',
 
 		'_controller' => function ($request) {
@@ -79,8 +80,6 @@ class WebRoutes {
 			 * Emmit Event which Type defined at run-time
 			 */
 
-			$type = ContentTypeEvent::PREFIX . $attributes[array_key_last($attributes)];
-			
 			/**
 			 * Generate the Response
 			 */
@@ -92,6 +91,9 @@ class WebRoutes {
 			 * Call Dispatcher to set the content type of the file
 			 */
 
+			$file = $request->attributes->get('file');
+			$attributes = explode('.', $file);
+			$type = ContentTypeEvent::PREFIX . $attributes[array_key_last($attributes)];
 			$request->attributes->get('dispatcher')->dispatch(new ContentTypeEvent($response, $type), $type);
 
     	if(!$response->headers->has('Content-Type'))
@@ -106,6 +108,5 @@ class WebRoutes {
 		}
 	]));
 
-	return $routes;
 	}
 }

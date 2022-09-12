@@ -7,6 +7,9 @@ use Leaf\Http\Response\Kernel;
 use Leaf\Plugins\AuthorizationListener;
 use Leaf\Plugins\ContentLengthListener;
 use Leaf\Plugins\ContentTypeListener;
+use Set\Routes\ApiRoutes;
+use Set\Routes\Routes;
+use Set\Routes\WebRoutes;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -23,9 +26,23 @@ $containerBuilder = new ContainerBuilder();
 
 $containerBuilder->register('response', Response::class);
 $containerBuilder->register('context', RequestContext::class);
-$containerBuilder->register('matcher', UrlMatcher::class)->setArguments([$routes, new Reference('context')]);
+
+$containerBuilder->register('matcher', UrlMatcher::class)
+->setArguments([new Reference('routes'), new Reference('context')]);
+
 $containerBuilder->register('controller_resolver', ControllerResolver::class);
 	
+/**
+ * User Routes
+ */
+
+$containerBuilder->register('web_routes', WebRoutes::class);
+$containerBuilder->register('api_routes', ApiRoutes::class);
+
+$containerBuilder->register('routes', Routes::class)->setArguments([
+	new Reference('web_routes'),
+	new Reference('api_routes')
+]);
 /**
  * Events Types
  */

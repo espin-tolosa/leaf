@@ -4,16 +4,17 @@ namespace Set\Routes;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Route as RoutingRoute;
+use Symfony\Component\Routing\RouteCollection;
 
-class ApiRoutes {
+class ApiRoutes extends RouteCollection {
 
-	public static function add($routes) {
+	public function __construct() {
 
 	/**
 	 * Index Controller
 	 */
 
-	$routes->add('event', new RoutingRoute('/event/{id}', [
+	$this->add('event', new RoutingRoute('/event/{id}', [
 		'name' => 'invited',
 
 		'_controller' => function ($request) {
