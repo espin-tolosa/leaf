@@ -50,7 +50,13 @@ class Kernel implements HttpKernelInterface {
 	}
 	
 	public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST,	bool $catch = false): Response	 {
+
+		/**
+		 * Symfony Get Request Context
+		 */
 		
+		$this->matcher->getContext()->fromRequest($request);
+
 		/**
 		 * Check Authorization
 		 */
@@ -61,38 +67,29 @@ class Kernel implements HttpKernelInterface {
 		catch (UnauthorizedAccessException $exception) {
 			return new Response(null,401);
 		}
+		
+		/**
+		 * Add Dispatcher to global request
+		 */
+		
+		$request->attributes->add(['dispatcher' => $this->dispatcher]);
 
 		/**
-		 * Process Request
+		 * Match the route and call the controller
 		 */
-
-		$this->matcher->getContext()->fromRequest($request);
-
+		
 		try {
-			$request->attributes->add($this->matcher->match($request->getPathInfo()));
-			
-			$controller = $this->controllerResolver->getController($request);
-			//$arguments = $this->argumentResolver->getArguments($request, $controller);
-
-			$request->attributes->add(['dispatcher' => $this->dispatcher]);
-
-			$response = call_user_func($controller, $request);
+			$response = $this->callControllerThrowable($request->getPathInfo(), $request);
 		}
 		
 		catch (Routing\Exception\ResourceNotFoundException $exception) {
-			$request->attributes->add($this->matcher->match('/not-found'));
 			$request->attributes->add(['exception' => $exception->getMessage()]);
-			
-			$controller = $this->controllerResolver->getController($request);
-			$response = call_user_func($controller, $request);
+			$response = $this->callControllerThrowable('/not-found', $request);
 		}
 		
 		catch (Exception $exception) {
-			$request->attributes->add($this->matcher->match('/server-error'));
 			$request->attributes->add(['exception' => $exception->getMessage()]);
-		
-			$controller = $this->controllerResolver->getController($request);
-			$response = call_user_func($controller, $request);
+			$response = $this->callControllerThrowable('/server-error', $request);
 		}
 
 		/**
@@ -102,5 +99,11 @@ class Kernel implements HttpKernelInterface {
 		$this->dispatcher->dispatch(new ResponseEvent($response, $request), 'kernel.response.content-length');
 
 		return $response;
+	}
+	
+	private function callControllerThrowable($path, Request $request) {
+			$request->attributes->add($this->matcher->match($path)); //!migth throw
+			$controller = $this->controllerResolver->getController($request);
+			return call_user_func($controller, $request);
 	}
 }
