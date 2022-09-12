@@ -3,16 +3,20 @@
 namespace Leaf\Http\Response;
 
 use Exception;
-use Leaf\Http\Events\AuthorizationEvent;
+use Leaf\Http\Events\RequestEvent;
 use Leaf\Http\Events\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 //use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+
 
 /**
  * Request / Response process
@@ -34,8 +38,8 @@ class Kernel implements HttpKernelInterface {
 	private EventDispatcher $dispatcher;
 	
 	public function __construct(
-	UrlMatcher $matcher,
-	ControllerResolver $controllerResolver
+	UrlMatcherInterface $matcher,
+	ControllerResolverInterface $controllerResolver
 	/*, ArgumentResolver $argumentResolver */,
 	EventDispatcher $dispatcher )
 		{
@@ -51,11 +55,11 @@ class Kernel implements HttpKernelInterface {
 		 * Check Authorization
 		 */
 
-		$response = new Response();
-		$this->dispatcher->dispatch(new ResponseEvent($response, $request), 'kernel.authorization');
-		if($request->attributes->has('response') && $request->attributes->get('response')->getStatusCode() === 401)
-		{
-			return $request->attributes->get('response');
+		try {
+			$this->dispatcher->dispatch(new RequestEvent($request), 'kernel.authorization');
+		}
+		catch (UnauthorizedAccessException $exception) {
+			return new Response(null,401);
 		}
 
 		/**

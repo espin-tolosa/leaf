@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace App\Leaf\Tests;
 
 use App\Leaf\Framework;
-
+use Leaf\Http\Response\Kernel;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -14,48 +17,30 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 final class FrameworkTest extends TestCase
 {
-	public function testNotFoundHandling()
-	{
-			$framework = $this->getFrameworkForException(new ResourceNotFoundException());
+	public function testControllerResponse()
+{
+    $matcher = $this->createMock(Routing\Matcher\UrlMatcher ::class);
+    // use getMock() on PHPUnit 5.3 or below
+    // $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
 
-			$response = $framework->handle(new Request());
+    $matcher
+        ->method('match')
+        ->will($this->returnValue([
+            '_route' => '/index/{name}',
+            '_controller' => function($name) {return new Response('sam', 200);},
+        ]));
 
-			$this->assertEquals(404, $response->getStatusCode());
-	}
+    $matcher
+        ->method('getContext')
+        ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+    $controllerResolver = new ControllerResolver();
+		$eventDispatcher = new EventDispatcher();
 
-	private function getFrameworkForException($exception)
-	{
-			$matcher = $this->createMock(Routing\Matcher\UrlMatcherInterface::class);
-			// use getMock() on PHPUnit 5.3 or below
-			// $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
+    $framework = new Kernel($matcher, $controllerResolver, $eventDispatcher);
 
-			$matcher
-					->expects($this->exactly(2))
-					->method('match')
-					->will($this->throwException($exception))
-			;
-			$matcher
-					->expects($this->exactly(2))
-					->method('getContext')
-					->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
-			;
-			$controllerResolver = $this->createMock(ControllerResolverInterface::class);
-			//$argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+    $response = $framework->handle(new Request());
 
-			return new Framework($matcher, $controllerResolver);
-	}
-//	//! PHPUnit assumes that neither the test code nor the tested code emit output or send headers
-//	/**
-//	 * @runInSeparateProcess
-//	 */
-//    public function testIndex()
-//    {
-//			  ob_start();
-//        $_GET['name'] = 'Fabien';
-//        //include "index.php";
-//				include "../index.php";
-//        $content = ob_get_clean();
-//
-//        $this->assertEquals('Hello Fabien', $content);
-//    }
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertStringContainsString('sam', $response->getContent());
+}
 }
