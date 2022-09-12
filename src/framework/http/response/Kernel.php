@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 //use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -51,11 +50,13 @@ class Kernel implements HttpKernelInterface {
 	
 	public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST,	bool $catch = false): Response	 {
 
+		$this->matcher->getContext()->fromRequest($request);
+
 		/**
 		 * Symfony Get Request Context
 		 */
 		
-		$this->matcher->getContext()->fromRequest($request);
+		 $this->matcher->getContext()->fromRequest($request);
 
 		/**
 		 * Check Authorization

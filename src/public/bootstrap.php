@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Leaf\Http\Controller\ResourceController;
 use Leaf\Http\Events\ContentTypeEvent;
 use Leaf\Http\Events\RequestEvent;
 use Leaf\Http\Events\ResponseEvent;
@@ -7,6 +8,7 @@ use Leaf\Http\Response\Kernel;
 use Leaf\Plugins\AuthorizationListener;
 use Leaf\Plugins\ContentLengthListener;
 use Leaf\Plugins\ContentTypeListener;
+use Set\Resources\ResourceRenderer;
 use Set\Routes\ApiRoutes;
 use Set\Routes\Routes;
 use Set\Routes\WebRoutes;
