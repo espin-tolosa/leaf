@@ -16,6 +16,15 @@ class WebRoutes extends RouteCollection {
 	 * Index Controller
 	 */
 
+	$this->add('index', new RoutingRoute('/', [
+		'_controller' => function ($request) {
+			$request->attributes->add(['_route' => 'spa']);
+			$resource = new ResourceRenderer($request);
+			$status = $resource->template();
+			return new Response(ob_get_clean(), $status ? $status : 200);
+		}
+	]));
+
 	$this->add('user_panel', new RoutingRoute('/user/{name}', [
 		'name' => 'invited',
 
@@ -27,43 +36,6 @@ class WebRoutes extends RouteCollection {
 		}
 	]));
 
-	/**
-	 * SPA Controller
-	 */
-
-	$this->add('spa', new RoutingRoute('/spa', [
-		'_controller' => function ($request) {
-			$resource = new ResourceRenderer($request);
-			$status = $resource->template();
-			return new Response(ob_get_clean(), $status ? $status : 200);
-		}
-	]));
-
-	/**
-	 * NOT FOUND
-	 */
-
-	 $this->add('not_found', new RoutingRoute('/not-found', [
-		'_controller' => function ($request) {
-			$resource = new ResourceRenderer($request);
-			$exception = $request->attributes->get('exception');
-			$resource->template(['failedRoute' => $request->getPathInfo(), 'exception' => $exception]);
-			return new Response(ob_get_clean(), 404);
-		}
-	]));
-
-	/**
-	 * SERVER ERROR
-	 */
-
-	 $this->add('server_error', new RoutingRoute('/server-error', [
-		'_controller' => function ($request) {
-			$resource = new ResourceRenderer($request);
-			$exception = $request->attributes->get('exception');
-			$resource->template(['failedRoute' => $request->getPathInfo(), 'exception' => $exception]);
-			return new Response(ob_get_clean(), 500);
-		}
-	]));
 
 	/**
 	 * Resources of the web: svg, css, js

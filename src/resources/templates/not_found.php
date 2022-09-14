@@ -8,9 +8,9 @@
 		<link rel="stylesheet" href="/public/index.619048c6.css">
   </head>
   <body>
-		<h1 class="error-message">Sorry, we can't find this resource: <span class="failed-resource"> <?= $view['failedRoute'] ?> </span> in our service</h1>
+		<h1 class="error-message">You asked for <span class="failed-resource"> <?= $view['failedRoute'] ?> </span> but...</h1>
 		<p>
-			<?php var_dump($exception); ?>
+			Error 404: <?= $exception ?>
 		</p>
   </body>
 </html>

@@ -10,6 +10,7 @@ use Leaf\Plugins\ContentLengthListener;
 use Leaf\Plugins\ContentTypeListener;
 use Set\Resources\ResourceRenderer;
 use Set\Routes\ApiRoutes;
+use Set\Routes\ErrorRoutes;
 use Set\Routes\Routes;
 use Set\Routes\WebRoutes;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -40,10 +41,12 @@ $containerBuilder->register('controller_resolver', ControllerResolver::class);
 
 $containerBuilder->register('web_routes', WebRoutes::class);
 $containerBuilder->register('api_routes', ApiRoutes::class);
+$containerBuilder->register('error_routes', ErrorRoutes::class);
 
 $containerBuilder->register('routes', Routes::class)->setArguments([
 	new Reference('web_routes'),
-	new Reference('api_routes')
+	new Reference('api_routes'),
+	new Reference('error_routes')
 ]);
 /**
  * Events Types

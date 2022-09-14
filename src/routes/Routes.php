@@ -6,9 +6,10 @@ use Symfony\Component\Routing\RouteCollection;
 
 class Routes extends RouteCollection {
 
-	public function __construct(WebRoutes $web, ApiRoutes $api)
+	public function __construct(WebRoutes $web, ApiRoutes $api, ErrorRoutes $error)
 	{
 		$this->addCollection($web);
 		$this->addCollection($api);
+		$this->addCollection($error);
 	}
 }
